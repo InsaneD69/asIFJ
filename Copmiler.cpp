@@ -26,9 +26,9 @@ class Parser {
 public:
     int curFor; // для проверки, находится ли парсер в конструкции FOR и если да, то в какой вложенности конструкции
     int curIf; // для проверки, находится ли парсер в конструкции IF и если да, то в какой вложенности конструкции
-    int inFunc; // для проверки, находится ли парсер в функции (любой)
+    bool inFunc; // для проверки, находится ли парсер в функции (любой)
     string curFunc="Функция"; // если парсер в функции, то curFunc - название этой функции
-    int inArgs= 0;  // для проверки, находится ли парсер в параметрах функции 
+    bool inArgs= 0;  // для проверки, находится ли парсер в параметрах функции 
 
     string typeWar = "short";//для проверки ParsVars
 
@@ -49,15 +49,26 @@ public:
 
             if (nameVar.find(forbsimb) != -1) { throw exception(); };
         }
-        if (this->globalVarInt[nameVar] != 0) { throw exception(); };
-        if (this->globalVarShort[nameVar] != 0) { throw exception(); };
-        if (this->globalVarChar[nameVar] != 0) { throw exception(); };
-        if (this->funcs.at(curFunc).argInts[nameVar] != 0) { throw exception(); };
-        if (this->funcs.at(curFunc).argShorts[nameVar] != 0) { throw exception(); };
-        if (this->funcs.at(curFunc).argChars[nameVar] != 0) {throw exception();};
-        if (this->funcs.at(curFunc).localInts[nameVar] != 0) { throw exception(); };
-        if (this->funcs.at(curFunc).localShorts[nameVar] != 0) { throw exception(); };
-        if (this->funcs.at(curFunc).localChars[nameVar] != 0) { throw exception(); };
+         
+        
+        {auto it  = this->globalVarChar.find(nameVar);
+        if (it != this->globalVarChar.end()) { throw exception(); }; }
+        {auto it = this->globalVarInt.find(nameVar);
+        if (it != this->globalVarInt.end()) { throw exception(); }; }
+        {auto it = this->globalVarShort.find(nameVar);
+        if (it != this->globalVarShort.end()) { throw exception(); }; }
+        {auto it = this->funcs.at(curFunc).argInts.find(nameVar);
+        if (it != this->funcs.at(curFunc).argInts.end()) { throw exception(); }; }
+        {auto it = this->funcs.at(curFunc).argChars.find(nameVar);
+        if (it != this->funcs.at(curFunc).argChars.end()) { throw exception(); }; }
+        {auto it = this->funcs.at(curFunc).argShorts.find(nameVar);
+        if (it != this->funcs.at(curFunc).argShorts.end()) { throw exception(); }; }
+        {auto it = this->funcs.at(curFunc).localChars.find(nameVar);
+        if (it != this->funcs.at(curFunc).localChars.end()) { throw exception(); }; }
+        {auto it = this->funcs.at(curFunc).localShorts.find(nameVar);
+        if (it != this->funcs.at(curFunc).localShorts.end()) { throw exception(); }; }
+        {auto it = this->funcs.at(curFunc).localInts.find(nameVar);
+        if (it != this->funcs.at(curFunc).localInts.end()) { throw exception(); }; }
     }
 
     void writing_arguments(string nameVar, int value, string typeVar) {
@@ -70,21 +81,20 @@ public:
             funcs.at(curFunc).dequeArgs.push_back(typeVar);
         }
         if ((this->inFunc == 1) && (this->inArgs == 0)) {
-            funcs.at(curFunc).localInts[nameVar] = value;;
+            funcs.at(curFunc).localInts[nameVar] = value;
             funcs.at(curFunc).dequeVars.push_back(typeVar);
         }
     }
-        
     void writing_arguments(string nameVar, char value, string typeVar) {
-        if ((this->inFunc == 0) && (this->inArgs == 1)) {
+        if ((this->inFunc == 0) && (this->inArgs == 0)) {
             globalVarChar[nameVar]= value;
         }
          if ((this->inFunc == 0) && (this->inArgs == 1)) {
-            funcs.at(curFunc).argChars[nameVar] = value;;
+            funcs.at(curFunc).argChars[nameVar] = value;
             funcs.at(curFunc).dequeArgs.push_back(typeVar);
         }
          if ((this->inFunc == 1) && (this->inArgs == 0)) {
-             funcs.at(curFunc).localChars[nameVar] = value;;
+             funcs.at(curFunc).localChars[nameVar] = value;
              funcs.at(curFunc).dequeVars.push_back(typeVar);
          };
         
@@ -96,11 +106,11 @@ public:
             globalVarShort[nameVar]= value;
         }
         if ((this->inFunc == 0) && (this->inArgs == 1)) {
-            funcs.at(curFunc).argShorts[nameVar] = value;;
+            funcs.at(curFunc).argShorts[nameVar] = value;
             funcs.at(curFunc).dequeArgs.push_back(typeVar);
         }
         if ((this->inFunc == 1) && (this->inArgs == 0)) {
-            funcs.at(curFunc).localShorts[nameVar] = value;;
+            funcs.at(curFunc).localShorts[nameVar] = value;
             funcs.at(curFunc).dequeVars.push_back(typeVar);
         }
         
@@ -527,11 +537,11 @@ int main()
     }
     cout << "Args" << endl;
     for (auto command : parser.funcs.at(parser.curFunc).dequeArgs) {
-        cout << command << "  " << command << endl;
+        cout  << "  " << command << endl;
     }
     cout << "Vars" << endl;
     for (auto command : parser.funcs.at(parser.curFunc).dequeVars) {
-        cout << command << "  " << command << endl;
+        cout<< "  " << command << endl;
     }
     file.close();
 }

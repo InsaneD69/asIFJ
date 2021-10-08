@@ -72,21 +72,26 @@ public:
     }
 
     void writing_arguments(string nameVar, int value, string typeVar) {
-        if ((this->inFunc == 0) && (this->inArgs == 0)) {
+        if ((this->inFunc == 0) && (this->inArgs == 0)) {// записu global переменной в LogicCommands нету
 
             globalVarInt[nameVar] = value;
         }
-        if ((this->inFunc == 0) && (this->inArgs == 1)) {
+        if ((this->inFunc == 0) && (this->inArgs == 1)) {// запись аргумента в LogicCommands нету
             funcs.at(curFunc).argInts[nameVar] = value;
             funcs.at(curFunc).dequeArgs.push_back(typeVar);
         }
         if ((this->inFunc == 1) && (this->inArgs == 0)) {
             funcs.at(curFunc).localInts[nameVar] = value;
             funcs.at(curFunc).dequeVars.push_back(typeVar);
+            this->logicCommands.push_back(nameVar + " = " + to_string(value));// запись локальной переменной в LogicCommands
         }
+        
     }
-    void writing_arguments(string nameVar, char value, string typeVar) {
+    void writing_arguments(string nameVar, char value1, string typeVar) {
+        
+        char value = static_cast<int>(value1);
         if ((this->inFunc == 0) && (this->inArgs == 0)) {
+            
             globalVarChar[nameVar]= value;
         }
          if ((this->inFunc == 0) && (this->inArgs == 1)) {
@@ -94,8 +99,10 @@ public:
             funcs.at(curFunc).dequeArgs.push_back(typeVar);
         }
          if ((this->inFunc == 1) && (this->inArgs == 0)) {
+            
              funcs.at(curFunc).localChars[nameVar] = value;
              funcs.at(curFunc).dequeVars.push_back(typeVar);
+             this->logicCommands.push_back(nameVar + " = " + to_string(value));
          };
         
     }
@@ -113,6 +120,7 @@ public:
             funcs.at(curFunc).localShorts[nameVar] = value;
             funcs.at(curFunc).dequeVars.push_back(typeVar);
         }
+        this->logicCommands.push_back(nameVar + " = " + to_string(value));
         
     }
 
@@ -362,7 +370,7 @@ public:
     }
 
 public:
-    Parser(string file_with_code) : inFunc(false), curFor(0), curIf(0) {
+    Parser(string file_with_code) : inFunc(true), curFor(0), curIf(0) {
         //open file_with_code
         //check is_file_opened
         //while(file opened)
@@ -543,5 +551,10 @@ int main()
     for (auto command : parser.funcs.at(parser.curFunc).dequeVars) {
         cout<< "  " << command << endl;
     }
-    file.close();
+    cout << "LogicCommands"<<endl;
+    for (auto command : parser.logicCommands) {
+        printf_s("\n%s", command.c_str());
+
+    }
+
 }
